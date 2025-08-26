@@ -33,7 +33,7 @@ func NewRect(x, y, width, height float64) Rect {
 func (rect Rect) Intersects(other Rect) bool {
 	return rect.X <= other.MaxX() &&
 		other.X <= rect.MaxX() &&
-		rect.Y <= rect.MaxY() &&
+		rect.Y <= other.MaxY() &&
 		other.Y <= rect.MaxY()
 }
 

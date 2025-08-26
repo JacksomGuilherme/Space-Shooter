@@ -61,6 +61,7 @@ func (game *Game) Update() error {
 				game.Lasers = append(game.Lasers[:j], game.Lasers[j+1:]...)
 
 				game.Score++
+				break
 			}
 		}
 	}
