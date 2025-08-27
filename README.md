@@ -30,6 +30,11 @@ Esse projeto foi inspirado pelo vídeo tutorial do canal **Go Lab Tutoriais**:
 
 ---
 
+## 📸 Screenshots
+![Gameplay](docs/screenshots/gameplay.jpg)
+
+---
+
 ## 🚀 Como Rodar o Projeto
 
 ### 🔹 Opção 1: Rodar o executável (mais fácil)
