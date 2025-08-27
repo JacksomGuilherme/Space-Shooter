@@ -11,6 +11,7 @@ type Player struct {
 	Image             *ebiten.Image
 	Position          Vector
 	Game              *Game
+	Sound             []byte
 	LaserLoadingTimer *Timer
 }
 
@@ -26,10 +27,13 @@ func NewPlayer(game *Game) *Player {
 		Y: 500,
 	}
 
+	sound := assets.PlayerSFX
+
 	return &Player{
 		Image:             image,
 		Position:          position,
 		Game:              game,
+		Sound:             sound,
 		LaserLoadingTimer: NewTimer(12),
 	}
 }
@@ -58,6 +62,7 @@ func (player *Player) Update() {
 			player.Position.Y - halfY/2,
 		}
 		laser := NewLaser(spawnPosition)
+		assets.PlaySFX(laser.Sound)
 		player.Game.AddLasers(laser)
 	}
 }

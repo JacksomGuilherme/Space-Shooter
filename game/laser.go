@@ -1,6 +1,7 @@
 package game
 
 import (
+	"math/rand"
 	"space_shooter/assets"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,6 +11,7 @@ import (
 type Laser struct {
 	Image    *ebiten.Image
 	Position Vector
+	Sound    []byte
 }
 
 // NewLaser é responsável por criar uma instância de Laser
@@ -23,9 +25,12 @@ func NewLaser(position Vector) *Laser {
 	position.X -= halfW
 	position.Y -= halfY
 
+	laserSound := assets.LaserSFX[rand.Intn(len(assets.LaserSFX))]
+
 	return &Laser{
 		Image:    image,
 		Position: position,
+		Sound:    laserSound,
 	}
 }
 

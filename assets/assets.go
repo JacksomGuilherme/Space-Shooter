@@ -7,6 +7,7 @@ import (
 	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
@@ -15,6 +16,7 @@ import (
 var assets embed.FS
 
 var PlayerSprite = mustLoadImage("player.png")
+var BackgroundSprite = mustLoadImage("background.png")
 
 var MeteorSprites = mustLoadImages("meteors/*.png")
 var LaserSprite = mustLoadImage("laser.png")
@@ -24,6 +26,10 @@ var PlanetsSprites = mustLoadImages("planets/*.png")
 
 var ScoreFont = mustLoadFont("font.ttf")
 var FontUi = mustLoadFont("fontui.ttf")
+
+var PlayerSFX = mustLoadSFX("audio/SFX/player_death_whirl.wav")
+var LaserSFX = mustLoadAllSFX("audio/SFX/laser/*.wav")
+var MeteorsSFX = mustLoadAllSFX("audio/SFX/explosions/*.wav")
 
 func mustLoadImage(name string) *ebiten.Image {
 	f, err := assets.Open(name)
@@ -75,4 +81,36 @@ func mustLoadFont(name string) font.Face {
 	}
 
 	return face
+}
+
+var audioContext = audio.NewContext(44100)
+
+func mustLoadSFX(name string) []byte {
+	data, err := assets.ReadFile(name)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+func mustLoadAllSFX(path string) [][]byte {
+	matches, err := fs.Glob(assets, path)
+	if err != nil {
+		panic(err)
+	}
+
+	sounds := make([][]byte, len(matches))
+	for i, match := range matches {
+		data, err := assets.ReadFile(match)
+		if err != nil {
+			panic(err)
+		}
+		sounds[i] = data
+	}
+	return sounds
+}
+
+func PlaySFX(data []byte) {
+	p := audioContext.NewPlayerFromBytes(data)
+	p.Play()
 }
