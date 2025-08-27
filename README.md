@@ -25,7 +25,7 @@ O objetivo principal desse projeto não é criar um game super elaborado, mas si
 ---
 
 ## 📺 Referência
-Esse projeto foi inspirado pelo vídeo tutorial do canal **Programação Dinâmica**:  
+Esse projeto foi inspirado pelo vídeo tutorial do canal **Go Lab Tutoriais**:  
 [🎥 Como criar um jogo do zero com Golang | Golang tutorial - Iniciantes](https://www.youtube.com/watch?v=BEe4MHDjAyU)
 
 ---
