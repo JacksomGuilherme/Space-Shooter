@@ -20,7 +20,7 @@ O objetivo principal desse projeto não é criar um game super elaborado, mas si
 
 ## 🎨 Assets e Sons
 - Sprites: [Kenney.nl](https://kenney.nl)  
-- Efeitos sonoros: [OpenGameArt - 8bit death whirl](https://opengameart.org/content/8bit-death-whirl)  
+- Efeitos sonoros: [OpenGameArt](https://opengameart.org/)  
 
 ---
 
