@@ -31,6 +31,12 @@ Esse projeto foi inspirado pelo vídeo tutorial do canal **Go Lab Tutoriais**:
 ---
 
 ## 🚀 Como Rodar o Projeto
+
+### 🔹 Opção 1: Rodar o executável (mais fácil)
+Se você só quer jogar, basta baixar/clonar este repositório e executar o arquivo space-shooter.exe
+
+### 🔹 Opção 2: Rodar via código fonte
+Se quiser compilar/rodar o jogo manualmente:
 1. Certifique-se de ter o **Go** instalado (versão 1.20 ou superior).  
 2. Clone este repositório:
    ```
