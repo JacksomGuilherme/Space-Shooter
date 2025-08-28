@@ -9,9 +9,11 @@ import (
 // Player representa o objeto do jogador dentro do jogo
 type Player struct {
 	Image             *ebiten.Image
+	Health            int
 	Position          Vector
 	Game              *Game
-	Sound             []byte
+	DeathSound        []byte
+	HitSound          []byte
 	LaserLoadingTimer *Timer
 }
 
@@ -27,13 +29,16 @@ func NewPlayer(game *Game) *Player {
 		Y: 500,
 	}
 
-	sound := assets.PlayerSFX
+	deathSound := assets.PlayerDeathSFX
+	hitSound := assets.PlayerHitSFX
 
 	return &Player{
 		Image:             image,
+		Health:            100,
 		Position:          position,
 		Game:              game,
-		Sound:             sound,
+		DeathSound:        deathSound,
+		HitSound:          hitSound,
 		LaserLoadingTimer: NewTimer(12),
 	}
 }
@@ -62,7 +67,7 @@ func (player *Player) Update() {
 			player.Position.Y - halfY/2,
 		}
 		laser := NewLaser(spawnPosition)
-		assets.PlaySFX(laser.Sound)
+		assets.PlaySFX(laser.Sound, 1)
 		player.Game.AddLasers(laser)
 	}
 }

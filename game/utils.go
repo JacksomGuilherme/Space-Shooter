@@ -1,8 +1,11 @@
 package game
 
 const (
-	screenWidth  = 800
-	screenHeight = 600
+	screenWidth   = 800
+	screenHeight  = 600
+	titleFontSize = fontSize * 1.5
+	fontSize      = 24
+	smallFontSize = fontSize / 2
 )
 
 // Vector representa o objeto com os atributos das posições X e Y de cada entidade dentro do jogo

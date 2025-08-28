@@ -27,8 +27,13 @@ var PlanetsSprites = mustLoadImages("planets/*.png")
 var ScoreFont = mustLoadFont("font.ttf")
 var FontUi = mustLoadFont("fontui.ttf")
 
-var PlayerSFX = mustLoadSFX("audio/SFX/player_death_whirl.wav")
+var MenuSFX = mustLoadSFX("audio/SFX/beep.wav")
+
+var PlayerDeathSFX = mustLoadSFX("audio/SFX/player_death_whirl.wav")
+var PlayerHitSFX = mustLoadSFX("audio/SFX/player_hit.wav")
 var LaserSFX = mustLoadAllSFX("audio/SFX/laser/*.wav")
+var FlightSFX = mustLoadSFX("audio/SFX/ship/spaceflight3.wav")
+
 var MeteorsSFX = mustLoadAllSFX("audio/SFX/explosions/*.wav")
 
 func mustLoadImage(name string) *ebiten.Image {
@@ -110,7 +115,9 @@ func mustLoadAllSFX(path string) [][]byte {
 	return sounds
 }
 
-func PlaySFX(data []byte) {
+func PlaySFX(data []byte, volume float64) {
 	p := audioContext.NewPlayerFromBytes(data)
+	p.SetVolume(volume)
+	p.Rewind()
 	p.Play()
 }

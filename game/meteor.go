@@ -12,6 +12,7 @@ type Meteor struct {
 	Image    *ebiten.Image
 	Speed    float64
 	Sound    []byte
+	Hit      bool
 	Position Vector
 }
 
@@ -47,6 +48,30 @@ func (meteor *Meteor) Draw(screen *ebiten.Image) {
 	options.GeoM.Translate(meteor.Position.X, meteor.Position.Y)
 
 	screen.DrawImage(meteor.Image, options)
+}
+
+func (meteor *Meteor) GetMeteorClass() string {
+	meteorArea := meteor.Image.Bounds().Dx() * meteor.Image.Bounds().Dy()
+	switch {
+	case meteorArea >= 5000:
+		return "L"
+	case meteorArea >= 1000:
+		return "M"
+	default:
+		return "S"
+	}
+}
+
+func (meteor *Meteor) DamageByClass() int {
+	switch meteor.GetMeteorClass() {
+	case "L":
+		return 30
+	case "M":
+		return 15
+	case "S":
+		return 5
+	}
+	return 0
 }
 
 // Collider determina as dimensões do retângulo de hitbox do meteoro
