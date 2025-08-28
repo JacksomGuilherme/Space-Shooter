@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 	"golang.org/x/image/font"
 )
 
@@ -208,7 +209,9 @@ func (game *Game) DrawGameMode(screen *ebiten.Image) {
 		meteor.Draw(screen)
 	}
 
-	text.Draw(screen, fmt.Sprintf("Points: %d", game.Score), assets.FontUi, 20, 100, color.White)
+	DrawHealthBar(screen, 20, screenHeight-40, 200, 20, game.Player.Health, 100)
+
+	text.Draw(screen, fmt.Sprintf("Points: %d", game.Score), assets.GetFontFace(24), 20, 30, color.White)
 }
 
 func (game *Game) DrawTitleMode(screen *ebiten.Image) {
@@ -230,10 +233,11 @@ func (game *Game) DrawTitleMode(screen *ebiten.Image) {
 	textHalfWidth := bounds.Max.X / 2
 	text.Draw(screen, titleText, assets.FontUi, (screenWidth/2 - textHalfWidth.Round()), 3*titleFontSize, color.White)
 
+	fontFace := assets.GetFontFace(32)
 	texts := "PRESS SPACE KEY"
-	bounds, _ = font.BoundString(assets.FontUi, texts)
+	bounds, _ = font.BoundString(fontFace, texts)
 	textHalfWidth = bounds.Max.X / 2
-	text.Draw(screen, texts, assets.FontUi, (screenWidth/2 - textHalfWidth.Round()), screenHeight-titleFontSize*5, color.White)
+	text.Draw(screen, texts, fontFace, (screenWidth/2 - textHalfWidth.Round()), screenHeight-titleFontSize*5, color.White)
 
 }
 
@@ -261,4 +265,32 @@ func (game *Game) DrawGameOverMode(screen *ebiten.Image) {
 		(screenHeight/2 - textHalfHeight.Round()),
 		color.White)
 
+}
+
+func DrawHealthBar(screen *ebiten.Image, x, y, width, height float32, current, max int) {
+	ratio := float32(current) / float32(max)
+	filled := width * ratio
+
+	barColor := color.RGBA{0, 200, 0, 255}
+	shadowBarColor := color.RGBA{0, 180, 0, 200}
+	if ratio < 0.5 {
+		barColor = color.RGBA{200, 200, 0, 255}
+		shadowBarColor = color.RGBA{180, 180, 0, 200}
+	}
+	if ratio < 0.25 {
+		barColor = color.RGBA{200, 0, 0, 255}
+		shadowBarColor = color.RGBA{180, 0, 0, 200}
+	}
+
+	text.Draw(screen, "HP", assets.GetFontFace(24), int(x), int(y-10), color.White)
+
+	vector.DrawFilledRect(screen, x, y, width, height, color.RGBA{50, 50, 50, 255}, false)
+
+	vector.DrawFilledRect(screen, x+2, y+2, width-4, height-4, color.RGBA{30, 30, 30, 255}, false)
+
+	halfHeight := height / 2
+
+	vector.DrawFilledRect(screen, x, y, filled, halfHeight, barColor, false)
+
+	vector.DrawFilledRect(screen, x, y+halfHeight, filled, halfHeight, shadowBarColor, false)
 }
