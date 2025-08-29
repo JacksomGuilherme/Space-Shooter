@@ -14,7 +14,7 @@ import (
 func (game *Game) NewTitleMode() {
 	game.Menu = NewMenu([]MenuItem{
 		{"NEW GAME", func() { game.mode = ModeGame }},
-		{"CHOOSE SHIP", func() {
+		{"SHIP SELECTION", func() {
 			game.NewShipSelectionMode()
 			game.mode = ModeShipSelection
 		}},
