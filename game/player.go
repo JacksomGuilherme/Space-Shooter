@@ -8,8 +8,7 @@ import (
 
 // Player representa o objeto do jogador dentro do jogo
 type Player struct {
-	Image             *ebiten.Image
-	Health            int
+	Ship              Ship
 	Position          Vector
 	Game              *Game
 	DeathSound        []byte
@@ -17,11 +16,24 @@ type Player struct {
 	LaserLoadingTimer *Timer
 }
 
+type Ship struct {
+	Image  *ebiten.Image
+	Health int
+	Laser  *ebiten.Image
+}
+
 // NewPlayer é responsável por criar uma instância de Player
 func NewPlayer(game *Game) *Player {
-	image := assets.PlayerSprite
+	ship := Ship{
+		Image:  assets.PlayerSpriteBlue,
+		Health: 100,
+	}
 
-	bounds := image.Bounds()
+	if game.Player != nil && game.Player.Ship.Image != nil {
+		ship.Image = game.Player.Ship.Image
+	}
+
+	bounds := ship.Image.Bounds()
 	halfW := float64(bounds.Dx()) / 2
 
 	position := Vector{
@@ -33,8 +45,7 @@ func NewPlayer(game *Game) *Player {
 	hitSound := assets.PlayerHitSFX
 
 	return &Player{
-		Image:             image,
-		Health:            100,
+		Ship:              ship,
 		Position:          position,
 		Game:              game,
 		DeathSound:        deathSound,
@@ -47,7 +58,7 @@ func NewPlayer(game *Game) *Player {
 func (player *Player) Update() {
 
 	speed := 6.0
-	bounds := player.Image.Bounds()
+	bounds := player.Ship.Image.Bounds()
 	halfW := float64(bounds.Dx()) / 2
 	halfY := float64(bounds.Dy()) / 2
 
@@ -84,12 +95,12 @@ func (player *Player) Draw(screen *ebiten.Image) {
 
 	options.GeoM.Translate(player.Position.X, player.Position.Y)
 
-	screen.DrawImage(player.Image, options)
+	screen.DrawImage(player.Ship.Image, options)
 }
 
 // Collider determina as dimensões do retângulo de hitbox do player
 func (player *Player) Collider() Rect {
-	bounds := player.Image.Bounds()
+	bounds := player.Ship.Image.Bounds()
 
 	return NewRect(
 		player.Position.X,

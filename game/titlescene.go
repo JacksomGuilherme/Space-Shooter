@@ -2,6 +2,7 @@ package game
 
 import (
 	"image/color"
+	"os"
 	"space_shooter/assets"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -9,9 +10,20 @@ import (
 	"golang.org/x/image/font"
 )
 
+func (game *Game) NewTitleMode() {
+	game.Menu = NewMenu([]MenuItem{
+		{"NEW GAME", func() { game.mode = ModeGame }},
+		{"CHOOSE SHIP", func() {
+			game.NewShipSelectionMode()
+			game.mode = ModeShipSelection
+		}},
+		{"EXIT GAME", func() { os.Exit(0) }},
+	})
+}
+
 // UpdateTitleMode é responsável por atualizar a lógica de Title
 func (game *Game) UpdateTitleMode() {
-	game.UpdateMenu()
+	game.UpdateMenuText()
 }
 
 // DrawTitleMode é responsável por desenhar a tela de Title
@@ -23,5 +35,5 @@ func (game *Game) DrawTitleMode(screen *ebiten.Image) {
 	textHalfWidth := bounds.Max.X / 2
 	text.Draw(screen, titleText, assets.FontUi, (screenWidth/2 - textHalfWidth.Round()), 3*titleFontSize, color.White)
 
-	game.DrawMenu(screen)
+	game.DrawMenuText(screen, int(screenHeight-titleFontSize*8))
 }

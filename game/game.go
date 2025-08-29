@@ -34,6 +34,7 @@ const (
 	ModeGame
 	ModeGameOver
 	ModePause
+	ModeShipSelection
 )
 
 type viewport struct {
@@ -78,14 +79,7 @@ func NewGame() *Game {
 	player := NewPlayer(g)
 	g.Player = player
 
-	menu := &Menu{
-		Items: []MenuItem{
-			{"NEW GAME", func() { g.mode = ModeGame }},
-			{"CHOOSE SHIP", func() { g.mode = ModeGame }},
-		},
-		SelectedItemIndex: 0,
-	}
-	g.Menu = menu
+	g.NewTitleMode()
 
 	return g
 }
@@ -99,9 +93,11 @@ func (game *Game) Update() error {
 		game.viewport.moving = true
 		game.UpdateGameMode()
 	case ModeGameOver:
-
+		game.UpdateGameOverMode()
 	case ModePause:
 		game.UpdatePauseMode()
+	case ModeShipSelection:
+		game.UpdateShipSelectionMode()
 	}
 
 	return nil
@@ -132,6 +128,8 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	case ModePause:
 		game.DrawGameMode(screen)
 		game.DrawPauseMode(screen)
+	case ModeShipSelection:
+		game.DrawShipSelectionMode(screen)
 	}
 }
 
@@ -146,6 +144,7 @@ func (game *Game) AddLasers(laser *Laser) {
 
 // Rest reinicia o jogo do zero
 func (game *Game) Reset() {
+	game.viewport = NewViewport()
 	game.Player = NewPlayer(game)
 	game.Meteors = nil
 	game.Lasers = nil

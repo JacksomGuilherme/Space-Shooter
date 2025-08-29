@@ -15,7 +15,7 @@ func (game *Game) UpdateGameOverMode() {
 	if game.gameOverCount > 0 {
 		game.gameOverCount--
 	}
-	if game.gameOverCount == 0 && inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	if game.gameOverCount == 0 && inpututil.IsKeyJustPressed(ebiten.KeySpace) || inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		menuSound := assets.MenuSFX
 		game.Reset()
 		assets.PlaySFX(menuSound, 1)

@@ -16,6 +16,7 @@ func (game *Game) UpdateGameMode() {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		game.viewport.moving = false
+		game.NewPauseMode()
 		game.mode = ModePause
 	}
 
@@ -38,7 +39,7 @@ func (game *Game) UpdateGameMode() {
 		meteor.Update()
 	}
 
-	if game.Player.Health <= 0 {
+	if game.Player.Ship.Health <= 0 {
 		assets.PlaySFX(game.Player.DeathSound, 1)
 		game.mode = ModeGameOver
 		game.gameOverCount = 30
@@ -49,7 +50,7 @@ func (game *Game) UpdateGameMode() {
 		if meteor.Collider().Intersects(game.Player.Collider()) {
 			if !meteor.Hit {
 				assets.PlaySFX(game.Player.HitSound, 1)
-				game.Player.Health -= meteor.DamageByClass()
+				game.Player.Ship.Health -= meteor.DamageByClass()
 				meteor.Hit = true
 				game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
 				break
@@ -59,12 +60,14 @@ func (game *Game) UpdateGameMode() {
 
 	for i, meteor := range game.Meteors {
 		for j, laser := range game.Lasers {
-			if meteor.Collider().Intersects(laser.Collider()) {
-				assets.PlaySFX(meteor.Sound, 1)
-				game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
-				game.Lasers = append(game.Lasers[:j], game.Lasers[j+1:]...)
-				game.Score++
-				break
+			if (meteor.Position.Y + meteor.Collider().Height*0.9) >= 0 {
+				if meteor.Collider().Intersects(laser.Collider()) {
+					assets.PlaySFX(meteor.Sound, 1)
+					game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
+					game.Lasers = append(game.Lasers[:j], game.Lasers[j+1:]...)
+					game.Score++
+					break
+				}
 			}
 		}
 	}
@@ -82,7 +85,7 @@ func (game *Game) DrawGameMode(screen *ebiten.Image) {
 		meteor.Draw(screen)
 	}
 
-	DrawHealthBar(screen, 20, screenHeight-40, 200, 20, game.Player.Health, 100)
+	DrawHealthBar(screen, 20, screenHeight-40, 200, 20, game.Player.Ship.Health, 100)
 
 	text.Draw(screen, fmt.Sprintf("Points: %d", game.Score), assets.GetFontFace(24), 20, 30, color.White)
 }

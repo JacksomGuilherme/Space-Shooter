@@ -15,7 +15,13 @@ import (
 //go:embed *
 var assets embed.FS
 
-var PlayerSprite = mustLoadImage("player.png")
+var PlayerSpriteBlue = mustLoadImage("ships/ship_blue.png")
+var PlayerSpriteRed = mustLoadImage("ships/ship_red.png")
+var PlayerSpriteGreen = mustLoadImage("ships/ship_green.png")
+var ShipShadowSprite = mustLoadImage("ships/ship_shadow.png")
+
+var PlatformSprit = mustLoadImage("platform.png")
+
 var BackgroundSprite = mustLoadImage("background.png")
 
 var MeteorSprites = mustLoadImages("meteors/*.png")
@@ -28,6 +34,7 @@ var ScoreFont = mustLoadFont("font.ttf")
 var FontUi = mustLoadFont("fontui.ttf")
 
 var MenuSFX = mustLoadSFX("audio/SFX/beep.wav")
+var MenuConfirmSFX = mustLoadSFX("audio/SFX/menu_confirm.wav")
 
 var PlayerDeathSFX = mustLoadSFX("audio/SFX/player_death_whirl.wav")
 var PlayerHitSFX = mustLoadSFX("audio/SFX/player_hit.wav")
