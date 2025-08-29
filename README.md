@@ -31,6 +31,13 @@ Esse projeto foi inspirado pelo vídeo tutorial do canal **Go Lab Tutoriais**:
 ---
 
 ## 📸 Screenshots
+### Menu Principal
+![Menu](docs/screenshots/menu.jpg)
+
+### Seleção de Naves
+![Ship_Selection](docs/screenshots/ship_selection.jpg)
+
+### Gameplay
 ![Gameplay](docs/screenshots/gameplay.jpg)
 
 ---
