@@ -10,6 +10,7 @@ import (
 // Meteor representa o objeto do meteor dentro do jogo
 type Meteor struct {
 	Image    *ebiten.Image
+	Color    string
 	Speed    float64
 	Sound    []byte
 	Hit      bool
@@ -18,7 +19,7 @@ type Meteor struct {
 
 // NewMeteor é responsável por criar uma instância de Meteor
 func NewMeteor() *Meteor {
-	image := assets.MeteorSprites[rand.Intn(len(assets.MeteorSprites))]
+	asset := assets.MeteorSprites[rand.Intn(len(assets.MeteorSprites))]
 	speed := rand.Float64() * 13
 
 	meteorSound := assets.MeteorsSFX[rand.Intn(len(assets.MeteorsSFX))]
@@ -29,11 +30,13 @@ func NewMeteor() *Meteor {
 	}
 
 	return &Meteor{
-		Image:    image,
+		Image:    asset.Image,
+		Color:    asset.Color,
 		Speed:    speed,
 		Sound:    meteorSound,
 		Position: position,
 	}
+
 }
 
 // Update é responsável por atualizar a lógica do Meteor

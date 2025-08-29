@@ -8,15 +8,18 @@ import (
 
 // Game representa o objeto do jogo
 type Game struct {
-	mode             Mode
-	Player           *Player
-	Lasers           []*Laser
-	Meteors          []*Meteor
-	Menu             *Menu
-	MeteorSpawnTimer *Timer
-	Score            int
-	viewport         viewport
-	gameOverCount    int
+	mode              Mode
+	Player            *Player
+	Lasers            []*Laser
+	Meteors           []*Meteor
+	PowerUps          []*PowerUp
+	Menu              *Menu
+	MeteorSpawnTimer  *Timer
+	PowerUpSpawnTimer *Timer
+	Score             int
+	MaxScore          int
+	viewport          viewport
+	gameOverCount     int
 }
 
 var (
@@ -72,8 +75,9 @@ func NewViewport() viewport {
 
 func NewGame() *Game {
 	g := &Game{
-		MeteorSpawnTimer: NewTimer(24),
-		viewport:         NewViewport(),
+		MeteorSpawnTimer:  NewTimer(24),
+		PowerUpSpawnTimer: NewTimer(150),
+		viewport:          NewViewport(),
 	}
 
 	player := NewPlayer(g)
@@ -144,6 +148,9 @@ func (game *Game) AddLasers(laser *Laser) {
 
 // Rest reinicia o jogo do zero
 func (game *Game) Reset() {
+	if game.MaxScore < game.Score {
+		game.MaxScore = game.Score
+	}
 	game.viewport = NewViewport()
 	game.Player = NewPlayer(game)
 	game.Meteors = nil

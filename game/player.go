@@ -17,16 +17,19 @@ type Player struct {
 }
 
 type Ship struct {
-	Image  *ebiten.Image
-	Health int
-	Laser  *ebiten.Image
+	Image           *ebiten.Image
+	Health          int
+	Laser           *ebiten.Image
+	ShieldActivated bool
+	ShieldTimer     *Timer
 }
 
 // NewPlayer é responsável por criar uma instância de Player
 func NewPlayer(game *Game) *Player {
 	ship := Ship{
-		Image:  assets.PlayerSpriteBlue,
-		Health: 100,
+		Image:       assets.PlayerSpriteBlue,
+		Health:      100,
+		ShieldTimer: NewTimer(600),
 	}
 
 	if game.Player != nil && game.Player.Ship.Image != nil {
@@ -87,6 +90,15 @@ func (player *Player) Update() {
 		assets.PlaySFX(laser.Sound, 1)
 		player.Game.AddLasers(laser)
 	}
+
+	if player.Ship.ShieldActivated {
+		player.Ship.ShieldTimer.Update()
+		if player.Ship.ShieldTimer.IsReady() {
+			player.Ship.ShieldTimer.Reset()
+
+			player.Ship.ShieldActivated = false
+		}
+	}
 }
 
 // Drawte é responsável por desenhar Player na tela
@@ -96,6 +108,25 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	options.GeoM.Translate(player.Position.X, player.Position.Y)
 
 	screen.DrawImage(player.Ship.Image, options)
+
+	if player.Ship.ShieldActivated {
+		image := assets.ShieldSprite
+		bounds := image.Bounds()
+		halfW := float64(bounds.Dx()) / 2
+		halfH := float64(bounds.Dy()) / 2
+
+		shipBounds := player.Ship.Image.Bounds()
+		shipHalfW := float64(shipBounds.Dx()) / 2
+		shipHalfH := float64(shipBounds.Dy()) / 2
+
+		options = &ebiten.DrawImageOptions{}
+		options.GeoM.Translate(
+			player.Position.X+shipHalfW-halfW,
+			player.Position.Y+shipHalfH-halfH,
+		)
+		screen.DrawImage(image, options)
+	}
+
 }
 
 // Collider determina as dimensões do retângulo de hitbox do player

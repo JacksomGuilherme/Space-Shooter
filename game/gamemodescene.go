@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"image/color"
+	"math/rand"
 	"space_shooter/assets"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -35,7 +36,11 @@ func (game *Game) UpdateGameMode() {
 		game.Meteors = append(game.Meteors, meteor)
 	}
 
-	for _, meteor := range game.Meteors {
+	for i, meteor := range game.Meteors {
+		if meteor.Position.Y > screenHeight {
+			game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
+			break
+		}
 		meteor.Update()
 	}
 
@@ -49,26 +54,46 @@ func (game *Game) UpdateGameMode() {
 	for i, meteor := range game.Meteors {
 		if meteor.Collider().Intersects(game.Player.Collider()) {
 			if !meteor.Hit {
-				assets.PlaySFX(game.Player.HitSound, 1)
-				game.Player.Ship.Health -= meteor.DamageByClass()
 				meteor.Hit = true
+				assets.PlaySFX(game.Player.HitSound, 1)
+				if !game.Player.Ship.ShieldActivated {
+					game.Player.Ship.Health -= meteor.DamageByClass()
+				}
 				game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
 				break
 			}
 		}
 	}
 
+	game.PowerUpSpawnTimer.Update()
 	for i, meteor := range game.Meteors {
 		for j, laser := range game.Lasers {
-			if (meteor.Position.Y + meteor.Collider().Height*0.9) >= 0 {
+			if (meteor.Position.Y + meteor.Collider().Height*0.9) > 0 {
 				if meteor.Collider().Intersects(laser.Collider()) {
 					assets.PlaySFX(meteor.Sound, 1)
+					if game.PowerUpSpawnTimer.IsReady() {
+						game.PowerUpSpawnTimer.Reset()
+						game.GeneratePowerUp(meteor)
+					}
 					game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
 					game.Lasers = append(game.Lasers[:j], game.Lasers[j+1:]...)
 					game.Score++
 					break
 				}
 			}
+		}
+	}
+
+	for _, powerUp := range game.PowerUps {
+		powerUp.Update()
+	}
+
+	for i, powerUp := range game.PowerUps {
+		if powerUp.Collider().Intersects(game.Player.Collider()) {
+			assets.PlaySFX(powerUp.Sound, 1)
+			powerUp.Action()
+			game.PowerUps = append(game.PowerUps[:i], game.PowerUps[i+1:]...)
+			break
 		}
 	}
 }
@@ -83,6 +108,10 @@ func (game *Game) DrawGameMode(screen *ebiten.Image) {
 
 	for _, meteor := range game.Meteors {
 		meteor.Draw(screen)
+	}
+
+	for _, powerUp := range game.PowerUps {
+		powerUp.Draw(screen)
 	}
 
 	DrawHealthBar(screen, 20, screenHeight-40, 200, 20, game.Player.Ship.Health, 100)
@@ -117,4 +146,21 @@ func DrawHealthBar(screen *ebiten.Image, x, y, width, height float32, current, m
 	vector.DrawFilledRect(screen, x, y, filled, halfHeight, barColor, false)
 
 	vector.DrawFilledRect(screen, x, y+halfHeight, filled, halfHeight, shadowBarColor, false)
+}
+
+func (game *Game) GeneratePowerUp(meteor *Meteor) {
+	spawnPowerUp := rand.Intn(100) + 1
+	if spawnPowerUp <= 20 && meteor.Color == "GREY" {
+		meteorWidth := meteor.Collider().Width
+		meteorHeight := meteor.Collider().Height
+
+		position := Vector{
+			meteor.Position.X + meteorWidth/2,
+			meteor.Position.Y + meteorHeight/2,
+		}
+
+		powerUp := game.NewPowerUp(position)
+		game.PowerUps = append(game.PowerUps, powerUp)
+	}
+
 }

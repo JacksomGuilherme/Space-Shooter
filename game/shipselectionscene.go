@@ -29,7 +29,7 @@ func (game *Game) UpdateShipSelectionMode() {
 
 // DrawShipSelectionMode é responsável por desenhar a tela de seleção de nave
 func (game *Game) DrawShipSelectionMode(screen *ebiten.Image) {
-	platform := assets.PlatformSprit
+	platform := assets.PlatformSprite
 	op := &ebiten.DrawImageOptions{}
 	screen.DrawImage(platform, op)
 
