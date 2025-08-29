@@ -38,7 +38,7 @@ Esse projeto foi inspirado pelo vídeo tutorial do canal **Go Lab Tutoriais**:
 ![Ship_Selection](docs/screenshots/ship_selection.jpg)
 
 ### Gameplay
-![Gameplay](docs/screenshots/gameplay.jpg)
+![Gameplay](docs/screenshots/gameplay_2.jpg)
 
 ---
 
