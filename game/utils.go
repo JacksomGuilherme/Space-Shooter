@@ -1,11 +1,19 @@
 package game
 
+import "space_shooter/assets"
+
 const (
 	screenWidth   = 800
 	screenHeight  = 600
 	titleFontSize = fontSize * 1.5
 	fontSize      = 24
 	smallFontSize = fontSize / 2
+)
+
+var (
+	ScoreFontFace    = assets.GetFontFace(24)
+	HealthFontFace   = assets.GetFontFace(24)
+	MenuItemFontFace = assets.GetFontFace(32)
 )
 
 // Vector representa o objeto com os atributos das posições X e Y de cada entidade dentro do jogo

@@ -12,7 +12,7 @@ import (
 type PowerUp struct {
 	Image    *ebiten.Image
 	Position Vector
-	Sound    []byte
+	Sound    string
 	Action   func()
 }
 
@@ -28,7 +28,7 @@ func (game *Game) NewPowerUp(position Vector) *PowerUp {
 	position.X -= halfW
 	position.Y -= halfY
 
-	powerUpSound := assets.ItemPickupSFX
+	powerUpSound := "item_pickup"
 
 	powerUp.Sound = powerUpSound
 	powerUp.Position = position

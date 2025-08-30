@@ -42,14 +42,13 @@ func (game *Game) DrawShipSelectionMode(screen *ebiten.Image) {
 
 	textInitialVerticalPos := screenHeight * 0.85
 
-	fontFace := assets.GetFontFace(32)
 	texts := "PRESS ENTER TO SELECT"
-	bounds, _ = font.BoundString(fontFace, texts)
+	bounds, _ = font.BoundString(MenuItemFontFace, texts)
 	textHalfWidth = bounds.Max.X / 2
-	text.Draw(screen, texts, fontFace, (screenWidth/2 - textHalfWidth.Round()), int(textInitialVerticalPos), color.White)
+	text.Draw(screen, texts, MenuItemFontFace, (screenWidth/2 - textHalfWidth.Round()), int(textInitialVerticalPos), color.White)
 
 	texts = "PRESS ESC TO GO BACK"
-	bounds, _ = font.BoundString(fontFace, texts)
+	bounds, _ = font.BoundString(MenuItemFontFace, texts)
 	textHalfWidth = bounds.Max.X / 2
-	text.Draw(screen, texts, fontFace, (screenWidth/2 - textHalfWidth.Round()), int(textInitialVerticalPos+40), color.White)
+	text.Draw(screen, texts, MenuItemFontFace, (screenWidth/2 - textHalfWidth.Round()), int(textInitialVerticalPos+40), color.White)
 }

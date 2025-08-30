@@ -13,6 +13,8 @@ import (
 type Menu struct {
 	Items             []MenuItem
 	Images            []MenuItemImage
+	SoundBeep         string
+	SoundConfirm      string
 	SelectedItemIndex int
 }
 
@@ -28,26 +30,29 @@ type MenuItemImage struct {
 
 func NewMenu(items []MenuItem) *Menu {
 	return &Menu{
-		Items: items,
+		Items:        items,
+		SoundBeep:    "menu_beep",
+		SoundConfirm: "menu_confirm",
 	}
 }
 
 func NewMenuImages(images []MenuItemImage) *Menu {
 	return &Menu{
 		Images:            images,
+		SoundBeep:         "menu_beep",
+		SoundConfirm:      "menu_confirm",
 		SelectedItemIndex: 0,
 	}
 }
 
 func (game *Game) UpdateMenuText() {
-	menuSound := assets.MenuSFX
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		selectedIndex := game.Menu.SelectedItemIndex
-		assets.PlaySFX(assets.MenuConfirmSFX, 1)
+		assets.PlaySound(game.Menu.SoundConfirm, 1)
 		game.Menu.Items[selectedIndex].Action()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		assets.PlaySFX(menuSound, 1)
+		assets.PlaySound(game.Menu.SoundBeep, 1)
 
 		if game.Menu.SelectedItemIndex == len(game.Menu.Items)-1 {
 			return
@@ -56,7 +61,7 @@ func (game *Game) UpdateMenuText() {
 		game.Menu.SelectedItemIndex += 1
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		assets.PlaySFX(menuSound, 1)
+		assets.PlaySound(game.Menu.SoundBeep, 1)
 
 		if (game.Menu.SelectedItemIndex - 1) < 0 {
 			return
@@ -67,16 +72,15 @@ func (game *Game) UpdateMenuText() {
 }
 
 func (game *Game) UpdateMenuImage() {
-	menuSound := assets.MenuSFX
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		selectedIndex := game.Menu.SelectedItemIndex
-		assets.PlaySFX(assets.MenuConfirmSFX, 1)
+		assets.PlaySound(game.Menu.SoundConfirm, 1)
 		game.Menu.Images[selectedIndex].Action()
 		game.mode = ModeTitle
 		game.NewTitleMode()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		assets.PlaySFX(menuSound, 1)
+		assets.PlaySound(game.Menu.SoundBeep, 1)
 
 		if (game.Menu.SelectedItemIndex - 1) < 0 {
 			return
@@ -85,7 +89,7 @@ func (game *Game) UpdateMenuImage() {
 		game.Menu.SelectedItemIndex -= 1
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
-		assets.PlaySFX(menuSound, 1)
+		assets.PlaySound(game.Menu.SoundBeep, 1)
 
 		if game.Menu.SelectedItemIndex == len(game.Menu.Images)-1 {
 			return
@@ -105,11 +109,10 @@ func (game *Game) DrawMenuText(screen *ebiten.Image, initalPos int) {
 			colorMenuItem = color.RGBA{102, 255, 255, 255}
 		}
 
-		fontFace := assets.GetFontFace(32)
 		texts := menu.Label
-		bounds, _ := font.BoundString(fontFace, texts)
+		bounds, _ := font.BoundString(MenuItemFontFace, texts)
 		textHalfWidth := bounds.Max.X / 2
-		text.Draw(screen, texts, fontFace, (screenWidth/2 - textHalfWidth.Round()), verticalMenuItemPos, colorMenuItem)
+		text.Draw(screen, texts, MenuItemFontFace, (screenWidth/2 - textHalfWidth.Round()), verticalMenuItemPos, colorMenuItem)
 		verticalMenuItemPos += 40
 	}
 	game.Player.Draw(screen)

@@ -1,10 +1,10 @@
 package game
 
 import (
-	"fmt"
 	"image/color"
 	"math/rand"
 	"space_shooter/assets"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -23,9 +23,14 @@ func (game *Game) UpdateGameMode() {
 
 	game.Player.Update()
 
+	newLasers := make([]*Laser, 0, len(game.Lasers))
 	for _, laser := range game.Lasers {
 		laser.Update()
+		if laser.Position.Y+laser.Collider().Height > 0 {
+			newLasers = append(newLasers, laser)
+		}
 	}
+	game.Lasers = newLasers
 
 	game.MeteorSpawnTimer.Update()
 	if game.MeteorSpawnTimer.IsReady() {
@@ -36,16 +41,17 @@ func (game *Game) UpdateGameMode() {
 		game.Meteors = append(game.Meteors, meteor)
 	}
 
-	for i, meteor := range game.Meteors {
-		if meteor.Position.Y > screenHeight {
-			game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
-			break
-		}
+	newMeteors := make([]*Meteor, 0, len(game.Meteors))
+	for _, meteor := range game.Meteors {
 		meteor.Update()
+		if meteor.Position.Y < screenHeight {
+			newMeteors = append(newMeteors, meteor)
+		}
 	}
+	game.Meteors = newMeteors
 
 	if game.Player.Ship.Health <= 0 {
-		assets.PlaySFX(game.Player.DeathSound, 1)
+		assets.PlaySound(game.Player.DeathSound, 1)
 		game.mode = ModeGameOver
 		game.gameOverCount = 30
 		game.Reset()
@@ -55,7 +61,7 @@ func (game *Game) UpdateGameMode() {
 		if meteor.Collider().Intersects(game.Player.Collider()) {
 			if !meteor.Hit {
 				meteor.Hit = true
-				assets.PlaySFX(game.Player.HitSound, 1)
+				assets.PlaySound(game.Player.HitSound, 1)
 				if !game.Player.Ship.ShieldActivated {
 					game.Player.Ship.Health -= meteor.DamageByClass()
 				}
@@ -66,11 +72,13 @@ func (game *Game) UpdateGameMode() {
 	}
 
 	game.PowerUpSpawnTimer.Update()
-	for i, meteor := range game.Meteors {
-		for j, laser := range game.Lasers {
+	for i := len(game.Meteors) - 1; i >= 0; i-- {
+		meteor := game.Meteors[i]
+		for j := len(game.Lasers) - 1; j >= 0; j-- {
+			laser := game.Lasers[j]
 			if (meteor.Position.Y + meteor.Collider().Height*0.9) > 0 {
 				if meteor.Collider().Intersects(laser.Collider()) {
-					assets.PlaySFX(meteor.Sound, 1)
+					assets.PlaySound(meteor.Sound, 1)
 					if game.PowerUpSpawnTimer.IsReady() {
 						game.PowerUpSpawnTimer.Reset()
 						game.GeneratePowerUp(meteor)
@@ -78,19 +86,25 @@ func (game *Game) UpdateGameMode() {
 					game.Meteors = append(game.Meteors[:i], game.Meteors[i+1:]...)
 					game.Lasers = append(game.Lasers[:j], game.Lasers[j+1:]...)
 					game.Score++
+					game.ScoreString = strconv.Itoa(game.Score)
 					break
 				}
 			}
 		}
 	}
 
+	newPowerUps := make([]*PowerUp, 0, len(game.PowerUps))
 	for _, powerUp := range game.PowerUps {
 		powerUp.Update()
+		if powerUp.Position.Y < screenHeight {
+			newPowerUps = append(newPowerUps, powerUp)
+		}
 	}
+	game.PowerUps = newPowerUps
 
 	for i, powerUp := range game.PowerUps {
 		if powerUp.Collider().Intersects(game.Player.Collider()) {
-			assets.PlaySFX(powerUp.Sound, 1)
+			assets.PlaySound(powerUp.Sound, 1)
 			powerUp.Action()
 			game.PowerUps = append(game.PowerUps[:i], game.PowerUps[i+1:]...)
 			break
@@ -116,7 +130,7 @@ func (game *Game) DrawGameMode(screen *ebiten.Image) {
 
 	DrawHealthBar(screen, 20, screenHeight-40, 200, 20, game.Player.Ship.Health, 100)
 
-	text.Draw(screen, fmt.Sprintf("Points: %d", game.Score), assets.GetFontFace(24), 20, 30, color.White)
+	text.Draw(screen, "Points: "+game.ScoreString, ScoreFontFace, 20, 30, color.White)
 }
 
 // DrawHealthBar desenha a barra de vida na tela
@@ -135,7 +149,7 @@ func DrawHealthBar(screen *ebiten.Image, x, y, width, height float32, current, m
 		shadowBarColor = color.RGBA{180, 0, 0, 200}
 	}
 
-	text.Draw(screen, "HP", assets.GetFontFace(24), int(x), int(y-10), color.White)
+	text.Draw(screen, "HP", HealthFontFace, int(x), int(y-10), color.White)
 
 	vector.DrawFilledRect(screen, x, y, width, height, color.RGBA{50, 50, 50, 255}, false)
 

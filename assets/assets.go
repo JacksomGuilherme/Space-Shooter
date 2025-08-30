@@ -6,6 +6,7 @@ import (
 	_ "image/png"
 	"io/fs"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -16,6 +17,12 @@ import (
 
 //go:embed *
 var assets embed.FS
+
+// Map global para sons
+var sounds = make(map[string][]byte)
+
+// AudioContext
+var audioContext = audio.NewContext(44100)
 
 // Space background
 var BackgroundSprite = mustLoadImage("background.png")
@@ -44,23 +51,27 @@ var GoldStarSprite = mustLoadImage("powerups/star_gold.png")
 var ScoreFont = mustLoadFont("font.ttf")
 var FontUi = mustLoadFont("fontui.ttf")
 
-// Menu Sound Effects
-var MenuSFX = mustLoadSFX("audio/SFX/beep.wav")
-var MenuConfirmSFX = mustLoadSFX("audio/SFX/menu_confirm.wav")
+func init() {
+	// Menu
+	loadSound("menu_beep", "audio/SFX/beep.wav")
+	loadSound("menu_confirm", "audio/SFX/menu_confirm.wav")
 
-// Player Sound Effects
-var PlayerDeathSFX = mustLoadSFX("audio/SFX/player_death_whirl.wav")
-var PlayerHitSFX = mustLoadSFX("audio/SFX/player_hit.wav")
-var LaserSFX = mustLoadAllSFX("audio/SFX/laser/*.wav")
-var ItemPickupSFX = mustLoadSFX("audio/SFX/item_pickup.wav")
+	// Player
+	loadSound("player_death", "audio/SFX/player_death_whirl.wav")
+	loadSound("player_hit", "audio/SFX/player_hit.wav")
+	loadSound("item_pickup", "audio/SFX/item_pickup.wav")
+
+	// Laser
+	loadSound("laser", "audio/SFX/laser/laser_1.wav")
+
+	// Explosões
+	loadSound("explosion", "audio/SFX/explosions/explosion_1.wav")
+}
 
 type MeteorAsset struct {
 	Image *ebiten.Image
 	Color string
 }
-
-// Meteors Sound Effects
-var MeteorsSFX = mustLoadAllSFX("audio/SFX/explosions/*.wav")
 
 func mustLoadMeteorsAssets(pathPattern string) []*MeteorAsset {
 	matches, err := fs.Glob(assets, pathPattern)
@@ -79,7 +90,6 @@ func mustLoadMeteorsAssets(pathPattern string) []*MeteorAsset {
 			color,
 		}
 	}
-
 	return meteorAssets
 }
 
@@ -94,23 +104,8 @@ func mustLoadImage(name string) *ebiten.Image {
 	if err != nil {
 		panic(err)
 	}
-
 	return ebiten.NewImageFromImage(img)
 }
-
-// func mustLoadImages(path string) []*ebiten.Image {
-// 	matches, err := fs.Glob(assets, path)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	images := make([]*ebiten.Image, len(matches))
-// 	for i, match := range matches {
-// 		images[i] = mustLoadImage(match)
-// 	}
-
-// 	return images
-// }
 
 func mustLoadFont(name string) font.Face {
 	f, err := assets.ReadFile(name)
@@ -131,7 +126,6 @@ func mustLoadFont(name string) font.Face {
 	if err != nil {
 		panic(err)
 	}
-
 	return face
 }
 
@@ -154,38 +148,40 @@ func GetFontFace(size int) font.Face {
 	if err != nil {
 		panic(err)
 	}
-
 	return face
 }
 
-var audioContext = audio.NewContext(44100)
-
-func mustLoadSFX(name string) []byte {
-	data, err := assets.ReadFile(name)
+// ---------------- Funções de Som ----------------
+func loadSound(name, path string) {
+	data, err := assets.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
-	return data
+	sounds[name] = data
 }
 
-func mustLoadAllSFX(path string) [][]byte {
-	matches, err := fs.Glob(assets, path)
+func loadAllSounds(prefix, pathPattern string) {
+	matches, err := fs.Glob(assets, pathPattern)
 	if err != nil {
 		panic(err)
 	}
 
-	sounds := make([][]byte, len(matches))
-	for i, match := range matches {
+	for _, match := range matches {
 		data, err := assets.ReadFile(match)
 		if err != nil {
 			panic(err)
 		}
-		sounds[i] = data
+		key := prefix + strings.TrimSuffix(filepath.Base(match), filepath.Ext(match))
+		sounds[key] = data
 	}
-	return sounds
 }
 
-func PlaySFX(data []byte, volume float64) {
+// Função pública para tocar som pelo nome
+func PlaySound(name string, volume float64) {
+	data, ok := sounds[name]
+	if !ok {
+		return
+	}
 	p := audioContext.NewPlayerFromBytes(data)
 	p.SetVolume(volume)
 	p.Rewind()

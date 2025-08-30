@@ -17,6 +17,7 @@ type Game struct {
 	MeteorSpawnTimer  *Timer
 	PowerUpSpawnTimer *Timer
 	Score             int
+	ScoreString       string
 	MaxScore          int
 	viewport          viewport
 	gameOverCount     int
@@ -44,6 +45,7 @@ type viewport struct {
 	x16    int
 	y16    int
 	moving bool
+	bgH    int
 }
 
 // Move é responsável por mover a viewport com a imagem do fundo
@@ -51,11 +53,9 @@ func (p *viewport) Move() {
 	if !p.moving {
 		return
 	}
-	s := BackgroundImage.Bounds().Size()
-	p.y16 += (s.Y / 512) * -1
-
+	p.y16 -= p.bgH / 512
 	if p.y16 <= 0 {
-		p.y16 = s.Y * 16
+		p.y16 = p.bgH * 16
 	}
 }
 
@@ -68,9 +68,9 @@ func NewViewport() viewport {
 	s := BackgroundImage.Bounds().Size()
 	return viewport{
 		x16:    0,
-		y16:    s.Y * 16, // começa no "pé" da imagem
+		y16:    s.Y * 16,
 		moving: false,
-	}
+		bgH:    s.Y}
 }
 
 func NewGame() *Game {
@@ -78,6 +78,7 @@ func NewGame() *Game {
 		MeteorSpawnTimer:  NewTimer(24),
 		PowerUpSpawnTimer: NewTimer(150),
 		viewport:          NewViewport(),
+		ScoreString:       "0",
 	}
 
 	player := NewPlayer(g)
@@ -155,7 +156,10 @@ func (game *Game) Reset() {
 	game.Player = NewPlayer(game)
 	game.Meteors = nil
 	game.Lasers = nil
+	game.PowerUps = nil
 	game.MeteorSpawnTimer.Reset()
+	game.PowerUpSpawnTimer.Reset()
 	game.Menu.SelectedItemIndex = 0
 	game.Score = 0
+	game.ScoreString = "0"
 }

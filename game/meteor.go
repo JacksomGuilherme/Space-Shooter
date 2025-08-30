@@ -12,7 +12,7 @@ type Meteor struct {
 	Image    *ebiten.Image
 	Color    string
 	Speed    float64
-	Sound    []byte
+	Sound    string
 	Hit      bool
 	Position Vector
 }
@@ -22,7 +22,7 @@ func NewMeteor() *Meteor {
 	asset := assets.MeteorSprites[rand.Intn(len(assets.MeteorSprites))]
 	speed := rand.Float64() * 13
 
-	meteorSound := assets.MeteorsSFX[rand.Intn(len(assets.MeteorsSFX))]
+	meteorSound := "explosion"
 
 	position := Vector{
 		X: rand.Float64() * screenWidth,
